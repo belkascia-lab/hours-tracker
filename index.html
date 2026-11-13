@@ -100,17 +100,16 @@ body.bonus-tab #content .bonus-month-card::before,body.bonus-tab #content .bonus
 
 .top-actions{display:flex;align-items:center;gap:8px;margin-left:auto}.job[data-action="selectJob"]{cursor:pointer}.job-action-btn{min-width:76px;text-align:center}.job[data-action="selectJob"]:focus-visible{outline:2px solid #168bff;outline-offset:2px}
 
-/* Distinct month and week surfaces across all five themes. CSS only: no JS or tab changes. */
-:root[data-theme=blue]{--bonus-month-head:#315f51;--bonus-month-total:#172938;--bonus-week-bg:#101a24;--bonus-week-border:#486b62}
-:root[data-theme=green]{--bonus-month-head:#15572b;--bonus-month-total:#10391f;--bonus-week-bg:#071e12;--bonus-week-border:#39864c}
-:root[data-theme=light]{--bonus-month-head:#c1ddf7;--bonus-month-total:#f8fbff;--bonus-week-bg:#e0efff;--bonus-week-border:#8bbfe8}
-:root[data-theme=grey]{--bonus-month-head:#435563;--bonus-month-total:#29333c;--bonus-week-bg:#38434d;--bonus-week-border:#617381}
-:root[data-theme=orange]{--bonus-month-head:#52330c;--bonus-month-total:#141414;--bonus-week-bg:#2b2116;--bonus-week-border:#8b6a40}
-body.bonus-tab #content .week-group{border-color:var(--bonus-week-border);margin-bottom:18px}
-body.bonus-tab #content .week-header{background:var(--bonus-month-head);color:var(--fg,#e9f1f8)}
-body.bonus-tab #content .week-total{background:var(--bonus-month-total);color:var(--fg,#e9f1f8)}
-body.bonus-tab #content .bonus-week-link{background:var(--bonus-week-bg);color:var(--fg,#e9f1f8);border-top:1px solid var(--bonus-week-border)}
-body.bonus-tab #content .bonus-week-link:active{filter:brightness(1.1)}
+/* Bonus colour contrast only. No layout, spacing, or JavaScript changes. */
+:root[data-theme=blue]{--month-header:#315f51;--month-total:#172938;--week-card:#101a24;--week-line:#486b62}
+:root[data-theme=green]{--month-header:#1a6336;--month-total:#103b23;--week-card:#082315;--week-line:#39864c}
+:root[data-theme=light]{--month-header:#c3e0fa;--month-total:#f8fbff;--week-card:#dbeeff;--week-line:#a0c9eb}
+:root[data-theme=grey]{--month-header:#465b6b;--month-total:#29333c;--week-card:#37424d;--week-line:#617381}
+:root[data-theme=orange]{--month-header:#58360e;--month-total:#151515;--week-card:#2d251a;--week-line:#8b6a40}
+:root[data-theme] body.bonus-tab #content .week-header{background:var(--month-header);color:var(--fg,#e9f1f8)}
+:root[data-theme] body.bonus-tab #content .week-total{background:var(--month-total);color:var(--fg,#e9f1f8)}
+:root[data-theme] body.bonus-tab #content .bonus-week-link{background:var(--week-card);color:var(--fg,#e9f1f8);border-top-color:var(--week-line)}
+:root[data-theme] body.bonus-tab #content .week-group{border-color:var(--week-line)}
 </style></head><body><div id="app"><div class="top"><div class="brand">Bonus Tracker</div><div class="top-actions"><button class="icon" id="searchToggle" title="Search entries" aria-label="Search entries">⌕</button><button class="icon settings-icon" id="settingsToggle" title="Settings" aria-label="Settings"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.9 1.9-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.02 1.56V21h-2.7v-.08A1.7 1.7 0 0 0 11.2 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-1.9-1.9.06-.06A1.7 1.7 0 0 0 7.76 16a1.7 1.7 0 0 0-1.56-1.02H6v-2.7h.2A1.7 1.7 0 0 0 7.76 11.2a1.7 1.7 0 0 0-.34-1.88l-.06-.06 1.9-1.9.06.06A1.7 1.7 0 0 0 11.2 7.76a1.7 1.7 0 0 0 1.02-1.56V6h2.7v.2A1.7 1.7 0 0 0 16 7.76a1.7 1.7 0 0 0 1.88-.34l.06-.06 1.9 1.9-.06.06A1.7 1.7 0 0 0 19.4 11.2a1.7 1.7 0 0 0 1.56 1.02H21v2.7h-.08A1.7 1.7 0 0 0 19.4 15Z" transform="translate(-1 -1)"/></svg></button></div><div id="searchArea" class="searchbar hide"><input id="searchInput" placeholder="Search comments, jobs, dates…"><button class="btn secondary" id="searchClose">Close</button></div><nav class="tabs"><button class="tab active" data-tab="jobs">Jobs</button><button class="tab" data-tab="entries">Entries</button><button class="tab" data-tab="bonus">Bonus</button></nav><main id="content"></main></div>
 <script>
 const THEME_KEY='bonus-tracker-theme-v1';
