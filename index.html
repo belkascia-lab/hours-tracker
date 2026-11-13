@@ -47,11 +47,11 @@ body.bonus-tab #content .bonus-month-values strong{font-size:1.15rem;line-height
 .swatch-blue{background:linear-gradient(135deg,#071b2f 50%,#168bff 50%)}
 .swatch-green{background:linear-gradient(135deg,#03210e 50%,#22c83c 50%)}
 .swatch-light{background:linear-gradient(135deg,#f1f7ff 50%,#168bff 50%)}
-.swatch-grey{background:linear-gradient(135deg,#252b32 50%,#0099e6 50%)}
+.swatch-grey{background:linear-gradient(135deg,#202020 50%,#777777 50%)}
 .swatch-orange{background:linear-gradient(135deg,#080808 50%,#ff9000 50%)}
 :root[data-theme=green]{--accent:#22c83c;--border:#39864c;--bg:#03190d;--surface:#082416;--card:#0b301a;--field:#061c11;--fg:#f0fff3;--muted:#b2d3b9}
 :root[data-theme=light]{--accent:#087af1;--border:#9acbf7;--bg:#eef5ff;--surface:#f9fcff;--card:#dceeff;--field:#fff;--fg:#102745;--muted:#466381}
-:root[data-theme=grey]{--accent:#009de6;--border:#617381;--bg:#20252b;--surface:#292f36;--card:#323b44;--field:#20272e;--fg:#f0f5fa;--muted:#b6c3ce}
+:root[data-theme=grey]{--accent:#a8a8a8;--border:#686868;--bg:#1c1c1c;--surface:#292929;--card:#383838;--field:#222222;--fg:#f5f5f5;--muted:#bdbdbd}
 :root[data-theme=orange]{--accent:#ff9000;--border:#8b6a40;--bg:#080808;--surface:#111111;--card:#202020;--field:#0b0b0b;--fg:#fafafa;--muted:#c7c1b7}
 :root[data-theme]:not([data-theme=blue]){background:var(--bg);color:var(--fg);color-scheme:dark}
 :root[data-theme=light]{color-scheme:light}
@@ -101,11 +101,11 @@ body.bonus-tab #content .bonus-month-card::before,body.bonus-tab #content .bonus
 .top-actions{display:flex;align-items:center;gap:8px;margin-left:auto}.job[data-action="selectJob"]{cursor:pointer}.job-action-btn{min-width:76px;text-align:center}.job[data-action="selectJob"]:focus-visible{outline:2px solid #168bff;outline-offset:2px}
 
 /* Bonus colour contrast only. No layout, spacing, or JavaScript changes. */
-:root[data-theme=blue]{--month-header:#315f51;--month-total:#172938;--week-card:#101a24;--week-line:#486b62}
-:root[data-theme=green]{--month-header:#1a6336;--month-total:#103b23;--week-card:#082315;--week-line:#39864c}
-:root[data-theme=light]{--month-header:#c3e0fa;--month-total:#f8fbff;--week-card:#dbeeff;--week-line:#a0c9eb}
-:root[data-theme=grey]{--month-header:#465b6b;--month-total:#29333c;--week-card:#37424d;--week-line:#617381}
-:root[data-theme=orange]{--month-header:#58360e;--month-total:#151515;--week-card:#2d251a;--week-line:#8b6a40}
+:root[data-theme=blue]{--month-header:#245343;--month-total:#172938;--week-card:#254538;--week-line:#486b62}
+:root[data-theme=green]{--month-header:#1d693a;--month-total:#103b23;--week-card:#163f27;--week-line:#39864c}
+:root[data-theme=light]{--month-header:#bddbf5;--month-total:#ffffff;--week-card:#e5eef8;--week-line:#a0c9eb}
+:root[data-theme=grey]{--month-header:#565656;--month-total:#292929;--week-card:#404040;--week-line:#686868}
+:root[data-theme=orange]{--month-header:#70420c;--month-total:#151515;--week-card:#322618;--week-line:#8b6a40}
 :root[data-theme] body.bonus-tab #content .week-header{background:var(--month-header);color:var(--fg,#e9f1f8)}
 :root[data-theme] body.bonus-tab #content .week-total{background:var(--month-total);color:var(--fg,#e9f1f8)}
 :root[data-theme] body.bonus-tab #content .bonus-week-link{background:var(--week-card);color:var(--fg,#e9f1f8);border-top-color:var(--week-line)}
