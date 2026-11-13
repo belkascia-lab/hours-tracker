@@ -395,10 +395,19 @@ $('#jobForm')?.addEventListener('submit' ,ev=>{ev.preventDefault();let f=new For
 if(entryModal&&editEntry){
   const durationField=document.querySelector('#entryForm input[name="duration"]');
   if(durationField){
-    const selectDuration=()=>{try{durationField.select()}catch(_){}};
-    durationField.addEventListener('pointerup',selectDuration);
-    durationField.addEventListener('click',selectDuration);
+    // Select all for replacement while suppressing Android's long-press callout.
+    durationField.style.webkitTouchCallout='none';
+    durationField.addEventListener('contextmenu',event=>event.preventDefault());
+    const selectDuration=()=>{try{durationField.setSelectionRange(0,durationField.value.length)}catch(_){}};
     durationField.addEventListener('focus',selectDuration);
+    durationField.addEventListener('pointerdown',event=>{
+      if(event.pointerType==='touch'){
+        event.preventDefault();
+        durationField.focus({preventScroll:true});
+        selectDuration();
+      }
+    });
+    durationField.addEventListener('click',selectDuration);
   }
 }
 $('#entryForm')?.addEventListener('submit',ev=>{ev.preventDefault();let f=new FormData(ev.target),raw=String(f.get('duration')).trim(),duration=/^\d+(\.\d+)?$/.test(raw)?Math.round(Number(raw)*60)/60:null;if(duration===null||duration<=0){alert('Enter decimal hours, e.g. 1.27 or 1.50.');return}let startTime=clockHours(String(f.get('start'))),finishTime=clockHours(String(f.get('finish')));if(startTime===null||finishTime===null){alert('Enter start and finish times');return}let old=state.entries.find(e=>e.id===editEntry),x={id:editEntry||uid(),jobId:old?.jobId||state.selected,date:String(f.get('date')),start:startTime,duration,hourlyRateSnapshot:old?.hourlyRateSnapshot??n(selected()?.hourly),bonusRateSnapshot:old?.bonusRateSnapshot??n(selected()?.bonusRate),comment:String(f.get('comment')),order:old?.order??Date.now()};if(editEntry)state.entries=state.entries.map(e=>e.id===editEntry?x:e);else state.entries.push(x);if(old)recalcDay(old.date,old.jobId);recalcDay(x.date,x.jobId);state.selected=x.jobId;editEntry=null;entryModal=false;save();render()})}
