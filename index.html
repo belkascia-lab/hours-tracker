@@ -108,9 +108,17 @@ body.bonus-tab #content .bonus-month-card::before,body.bonus-tab #content .bonus
 :root[data-theme=orange]{--month-header:#70420c;--month-total:#151515;--week-card:#322618;--week-line:#8b6a40}
 :root[data-theme] body.bonus-tab #content .week-header{background:var(--month-header);color:var(--fg,#e9f1f8)}
 :root[data-theme] body.bonus-tab #content .week-total{background:var(--month-total);color:var(--fg,#e9f1f8)}
-:root[data-theme] body.bonus-tab #content .bonus-week-link{background:var(--week-card);color:var(--fg,#e9f1f8);border-top-color:var(--week-line)}
+:root[data-theme] body.bonus-tab #content .bonus-week-link{background:var(--month-total);color:var(--fg,#e9f1f8);border-top-color:var(--week-line)}
 :root[data-theme] body.bonus-tab #content .week-group{border-color:var(--week-line)}
 
+.week-group .week-total[data-action="toggleMonth"],.week-group .week-header[data-action="toggleMonth"]{cursor:pointer}
+
+/* Bonus panels: week rows exactly match bonus total surface in every theme. */
+:root[data-theme] body.bonus-tab #content .week-group .bonus-week-link{background:var(--month-total) !important}
+/* Keep the whole month heading and bonus area clickable, even when expanded. */
+body.bonus-tab #content .week-group[data-action="toggleMonth"]{cursor:pointer}
+body.bonus-tab #content .week-group[data-action="toggleMonth"] .week-header,
+body.bonus-tab #content .week-group[data-action="toggleMonth"] .week-total{pointer-events:none}
 </style></head><body><div id="app"><div class="top"><div class="brand">Bonus Tracker</div><div class="top-actions"><button class="icon" id="searchToggle" title="Search entries" aria-label="Search entries">⌕</button><button class="icon settings-icon" id="settingsToggle" title="Settings" aria-label="Settings"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.9 1.9-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.02 1.56V21h-2.7v-.08A1.7 1.7 0 0 0 11.2 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-1.9-1.9.06-.06A1.7 1.7 0 0 0 7.76 16a1.7 1.7 0 0 0-1.56-1.02H6v-2.7h.2A1.7 1.7 0 0 0 7.76 11.2a1.7 1.7 0 0 0-.34-1.88l-.06-.06 1.9-1.9.06.06A1.7 1.7 0 0 0 11.2 7.76a1.7 1.7 0 0 0 1.02-1.56V6h2.7v.2A1.7 1.7 0 0 0 16 7.76a1.7 1.7 0 0 0 1.88-.34l.06-.06 1.9 1.9-.06.06A1.7 1.7 0 0 0 19.4 11.2a1.7 1.7 0 0 0 1.56 1.02H21v2.7h-.08A1.7 1.7 0 0 0 19.4 15Z" transform="translate(-1 -1)"/></svg></button></div></div><div id="searchArea" class="searchbar hide"><input id="searchInput" placeholder="Search comments, jobs, dates…"><button class="btn secondary" id="searchClose">Close</button></div><nav class="tabs"><button class="tab active" data-tab="jobs">Jobs</button><button class="tab" data-tab="entries">Entries</button><button class="tab" data-tab="bonus">Bonus</button></nav><main id="content"></main></div>
 <script>
 const THEME_KEY='bonus-tracker-theme-v1';
@@ -220,7 +228,7 @@ function bonusView(){
    const pay=wks.reduce((s,k)=>s+weekPay(weeks[k],job),0);
    const opened=expandedMonths.has(month);
    const label=new Date(Number(month.slice(0,4)),Number(month.slice(5,7))-1,1).toLocaleDateString('en-GB',{month:'long',year:'numeric'}).toUpperCase();
-   return `<section class="week-group" data-month="${month}" ${opened?'':`data-action="toggleMonth" data-id="${month}" role="button" tabindex="0"`}><div class="week-header" ${opened?`data-action="toggleMonth" data-id="${month}" role="button" tabindex="0"`:''}><span>${label}</span></div><div class="week-total"><span>Bonus</span><span class="bonus-month-values"><strong>${hoursMinutes(h)}</strong><strong>${money(pay)}</strong></span></div>${opened?wks.map(k=>{const wh=weeks[k].reduce((s,e)=>s+n(e.duration),0),bh=bonusHours(weeks[k]);return `<button type="button" class="bonus-week-link" data-action="openBonusWeek" data-id="${k}"><span>Week of ${dayDate(k).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}<small>Completed: ${hoursMinutes(wh)}</small></span><span class="bonus-week-values"><strong>${hoursMinutes(bh)}</strong><strong>${money(weekPay(weeks[k],job))}</strong></span><span class="bonus-chevron">›</span></button>`}).join(''):''}</section>`;
+   return `<section class="week-group" data-month="${month}" data-action="toggleMonth" data-id="${month}" role="button" tabindex="0"><div class="week-header"><span>${label}</span></div><div class="week-total"><span>Bonus</span><span class="bonus-month-values"><strong>${hoursMinutes(h)}</strong><strong>${money(pay)}</strong></span></div>${opened?wks.map(k=>{const wh=weeks[k].reduce((s,e)=>s+n(e.duration),0),bh=bonusHours(weeks[k]);return `<button type="button" class="bonus-week-link" data-action="openBonusWeek" data-id="${k}"><span>Week of ${dayDate(k).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}<small>Completed: ${hoursMinutes(wh)}</small></span><span class="bonus-week-values"><strong>${hoursMinutes(bh)}</strong><strong>${money(weekPay(weeks[k],job))}</strong></span><span class="bonus-chevron">›</span></button>`}).join(''):''}</section>`;
  }).join('');
 }
 
