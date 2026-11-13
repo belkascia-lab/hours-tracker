@@ -134,9 +134,15 @@ body.bonus-tab #content .week-group[data-action="toggleMonth"] .week-total{point
 /* Entry multi-selection: theme-matched highlighting. */
 .week-entry.multi-selected{background:var(--card,#17304a)!important;outline:2px solid var(--accent,#168bff);outline-offset:-3px;box-shadow:none;border-radius:8px}
 .entry-select-bar{position:fixed;top:72px;left:50%;transform:translateX(-50%);z-index:1000;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;min-height:66px;width:calc(100% - 36px);max-width:880px;box-sizing:border-box;margin:0;border:1px solid var(--border,#6baf82);border-radius:10px;background:var(--surface,#101a24);color:var(--fg,#fff);box-shadow:0 8px 26px #0005}
-.entry-select-bar .actions{display:flex;align-items:center;gap:8px;margin-left:auto;margin-right:auto}
+.entry-select-bar .actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-left:auto;margin-right:0;align-self:center;transform:translateY(-5px)}
 .entry-select-bar .actions .btn{padding:8px 12px}
 .week-entry{touch-action:pan-y;user-select:none;-webkit-user-select:none}
+
+/* Entries and Bonus: match the total summary background to the heading/page background. */
+body.entries-tab #content > .entry-overview,
+body.bonus-tab #content > .entry-overview{background:#101a24;}
+:root[data-theme] body.entries-tab #content > .entry-overview,
+:root[data-theme] body.bonus-tab #content > .entry-overview{background:var(--bg,#101a24);}
 </style></head><body><div id="app"><div class="top"><div class="brand">Bonus Tracker</div><div class="top-actions"><button class="icon" id="searchToggle" title="Search entries" aria-label="Search entries">⌕</button><button class="icon settings-icon" id="settingsToggle" title="Settings" aria-label="Settings"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.9 1.9-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.02 1.56V21h-2.7v-.08A1.7 1.7 0 0 0 11.2 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-1.9-1.9.06-.06A1.7 1.7 0 0 0 7.76 16a1.7 1.7 0 0 0-1.56-1.02H6v-2.7h.2A1.7 1.7 0 0 0 7.76 11.2a1.7 1.7 0 0 0-.34-1.88l-.06-.06 1.9-1.9.06.06A1.7 1.7 0 0 0 11.2 7.76a1.7 1.7 0 0 0 1.02-1.56V6h2.7v.2A1.7 1.7 0 0 0 16 7.76a1.7 1.7 0 0 0 1.88-.34l.06-.06 1.9 1.9-.06.06A1.7 1.7 0 0 0 19.4 11.2a1.7 1.7 0 0 0 1.56 1.02H21v2.7h-.08A1.7 1.7 0 0 0 19.4 15Z" transform="translate(-1 -1)"/></svg></button></div></div><div id="searchArea" class="searchbar hide"><input id="searchInput" placeholder="Search comments, jobs, dates…"><button class="btn secondary" id="searchClose">Close</button></div><nav class="tabs"><button class="tab active" data-tab="jobs">Jobs</button><button class="tab" data-tab="entries">Entries</button><button class="tab" data-tab="bonus">Bonus</button></nav><main id="content"></main></div>
 <script>
 const THEME_KEY='bonus-tracker-theme-v1';
