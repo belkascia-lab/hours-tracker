@@ -69,6 +69,16 @@ body.bonus-tab #content .bonus-month-values strong{font-size:1.15rem;line-height
 :root[data-theme]:not([data-theme=blue]) .theme-option.chosen{outline-color:var(--accent)}
 /* No decorative green strip at the left of monthly panels */
 body.bonus-tab #content .bonus-month-card::before,body.bonus-tab #content .bonus-month::before{display:none!important}
+
+/* Consistent Settings presentation across all themes */
+.settings-panel .settings-section{padding:16px 0;border-bottom:1px solid var(--border,#527a72)}
+.settings-panel .settings-section:first-child{padding-top:0}
+.settings-panel .settings-section:last-child{border-bottom:0;padding-bottom:0}
+.settings-panel .settings-section h2{margin:0 0 12px}
+.settings-panel .settings-section .muted{margin:0 0 12px}
+.settings-panel .settings-action{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;padding:14px 15px;border-radius:9px;border:1px solid var(--border,#527a72);background:var(--card,#172938);color:inherit;font:inherit;font-weight:650;cursor:pointer}
+.settings-panel .settings-action span:last-child{font-size:20px;line-height:1}
+.settings-panel input[type=file]{display:block;box-sizing:border-box;width:100%;margin:12px 0;padding:12px;border-radius:9px;border:1px solid var(--border,#527a72);background:var(--card,#172938);color:inherit}
 </style></head><body><div id="app"><div class="top"><div class="brand">Bonus Tracker</div><div class="top-actions"><button class="icon" id="searchToggle" title="Search entries" aria-label="Search entries">⌕</button><button class="icon settings-icon" id="settingsToggle" title="Settings" aria-label="Settings"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.9 1.9-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.02 1.56V21h-2.7v-.08A1.7 1.7 0 0 0 11.2 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-1.9-1.9.06-.06A1.7 1.7 0 0 0 7.76 16a1.7 1.7 0 0 0-1.56-1.02H6v-2.7h.2A1.7 1.7 0 0 0 7.76 11.2a1.7 1.7 0 0 0-.34-1.88l-.06-.06 1.9-1.9.06.06A1.7 1.7 0 0 0 11.2 7.76a1.7 1.7 0 0 0 1.02-1.56V6h2.7v.2A1.7 1.7 0 0 0 16 7.76a1.7 1.7 0 0 0 1.88-.34l.06-.06 1.9 1.9-.06.06A1.7 1.7 0 0 0 19.4 11.2a1.7 1.7 0 0 0 1.56 1.02H21v2.7h-.08A1.7 1.7 0 0 0 19.4 15Z" transform="translate(-1 -1)"/></svg></button></div></div><div id="searchArea" class="searchbar hide"><input id="searchInput" placeholder="Search comments, jobs, dates…"><button class="btn secondary" id="searchClose">Close</button></div><nav class="tabs"><button class="tab active" data-tab="jobs">Jobs</button><button class="tab" data-tab="entries">Entries</button><button class="tab" data-tab="bonus">Bonus</button></nav><main id="content"></main></div>
 <script>
 
@@ -129,7 +139,15 @@ el.querySelector('#tsManualSave')?.addEventListener('click',()=>{try{const rows=
 function tsParseOCR(raw,year){let lines=raw.split(/\n/).map(x=>x.trim()).filter(Boolean),monthNames=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];let rows=[];for(let i=0;i<12;i++){let idx=lines.findIndex(l=>new RegExp('\\b'+monthNames[i]+'[-\\s]*'+String(year).slice(-2)+'\\b','i').test(l));if(idx<0)throw Error('Could not identify all 12 month rows. Use the 2027 example or enter dates manually.');let line=lines.slice(idx,idx+2).join(' '),dates=[...line.matchAll(/\b(\d{1,2})\s*[-/]\s*(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/gi)].map(m=>{let mo=monthNames.indexOf(m[2].slice(0,3).toLowerCase());let yy=Number(year);if(i<=1&&mo>=10)yy--;return yy+'-'+String(mo+1).padStart(2,'0')+'-'+m[1].padStart(2,'0')});rows.push([year+'-'+String(i+1).padStart(2,'0'),dates])}return rows}
 async function tsRecognize(file,year){let status=document.getElementById('timesheetStatus');status.textContent='Reading photo… this can take a minute.';if(!window.Tesseract){await new Promise((resolve,reject)=>{let script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';script.onload=resolve;script.onerror=()=>reject(Error('Photo recognition could not load. Check your internet connection.'));document.head.appendChild(script)})}const result=await Tesseract.recognize(file,'eng');const rows=tsParseOCR(result.data.text,year);tsSetDraft(year,rows);status.textContent='Dates detected. Review and correct all 12 months before saving.'}
 function bindTimesheet(){const input=document.getElementById('timesheetUpload');if(!input)return;const yearInput=document.getElementById('tsYear'),year=()=>String(Number(yearInput.value)||2027);input.onchange=async()=>{const file=input.files?.[0];if(!file)return;const y=year();try{await saveTimesheetPhoto(file,y);await loadTimesheetPhoto(y);await tsRecognize(file,y)}catch(e){document.getElementById('timesheetStatus').textContent='Photo saved, but automatic reading failed: '+e.message+' You can still use the 2027 example or edit saved dates.'}};yearInput.onchange=()=>loadTimesheetPhoto(year()).catch(()=>{});document.getElementById('tsManual').onclick=()=>tsOpenManual(year());document.getElementById('tsExample').onclick=()=>{if(year()!=='2027'){alert('The supplied example is for 2027. Select 2027 first.');return}tsSetDraft('2027',TIMESHEET_2027)};document.querySelectorAll('.ts-edit').forEach(b=>b.onclick=()=>{const y=b.dataset.year;yearInput.value=y;tsOpenManual(y,tsJobSchedules()[y]);loadTimesheetPhoto(y).catch(()=>{})});tsBindEditor();loadTimesheetPhoto(year()).catch(()=>{})}
-function settingsView(){if(themePage)return `<section class="panel"><button type="button" class="btn secondary" id="themeBack">← Settings</button><h2>Themes</h2><p class="muted">Choose a theme. Your selection is saved on this device.</p><div class="theme-options">${[['blue','Dark Blue'],['green','Dark Green'],['light','Light'],['grey','Dark Grey'],['orange','Black & Orange']].map(([id,name])=>`<button type="button" class="theme-option ${getTheme()===id?'chosen':''}" data-theme="${id}"><span class="theme-swatch swatch-${id}"></span>${name}</button>`).join('')}</div></section>`;return `<section class="panel"><h2>Appearance</h2><button type="button" class="btn secondary" id="openThemes" style="width:100%;display:flex;align-items:center;justify-content:space-between;text-align:left">Themes <span aria-hidden="true">›</span></button></section><section class="panel"><h2>Data backup</h2><p class="muted">Download a backup of all jobs, entries and bonus schedules. Keep this file somewhere safe.</p><button class="btn" id="backupDownload">Download data</button></section><section class="panel"><h2>Import data</h2><p class="muted">Choose a historical import or Bonus Tracker backup (.json). Matching entry IDs are skipped. Existing entries are kept.</p><input type="file" id="backupUpload" accept=".json,application/json"><p id="importStatus" class="muted"></p><button class="btn secondary" id="backupImport" type="button">Upload data</button></section><section class="panel"><h2>Stored on this device</h2><p class="muted">${state.jobs.length} jobs · ${state.entries.length} entries. Data is saved in this browser, not your GitHub account. Download backups regularly.</p></section>`}
+function settingsView(){
+ if(themePage)return `<section class="panel settings-panel"><button type="button" class="btn secondary" id="themeBack">← Settings</button><h2>Themes</h2><p class="muted">Choose a theme. Your selection is saved on this device.</p><div class="theme-options">${[['blue','Dark Blue'],['green','Dark Green'],['light','Light'],['grey','Dark Grey'],['orange','Black & Orange']].map(([id,name])=>`<button type="button" class="theme-option ${getTheme()===id?'chosen':''}" data-theme="${id}"><span class="theme-swatch swatch-${id}"></span>${name}</button>`).join('')}</div></section>`;
+ return `<section class="panel settings-panel">
+  <div class="settings-section"><h2>Appearance</h2><button type="button" class="settings-action" id="openThemes"><span>Themes</span><span aria-hidden="true">›</span></button></div>
+  <div class="settings-section"><h2>Data backup</h2><p class="muted">Download a backup of all jobs, entries and bonus schedules. Keep this file somewhere safe.</p><button type="button" class="settings-action" id="backupDownload"><span>Download data</span><span aria-hidden="true">↓</span></button></div>
+  <div class="settings-section"><h2>Import data</h2><p class="muted">Choose a historical import or Bonus Tracker backup (.json). Matching entry IDs are skipped. Existing entries are kept.</p><input type="file" id="backupUpload" accept=".json,application/json"><p id="importStatus" class="muted"></p><button type="button" class="settings-action" id="backupImport"><span>Upload data</span><span aria-hidden="true">↑</span></button></div>
+  <div class="settings-section"><h2>Stored on this device</h2><p class="muted">${state.jobs.length} jobs · ${state.entries.length} entries. Data is saved in this browser, not your GitHub account. Download backups regularly.</p></div>
+ </section>`
+}
 function backupDownload(){const backup={format:'bonus-tracker-backup-v1',exportedAt:new Date().toISOString(),jobs:state.jobs,entries:state.entries,selected:state.selected,timesheets:state.timesheets||{}};const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='bonus-tracker-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 async function backupImport(){const file=document.getElementById('backupUpload')?.files?.[0],status=document.getElementById('importStatus');if(!file){alert('Choose a JSON file first.');return}try{const data=JSON.parse(await file.text());if(data.format!=='bonus-tracker-backup-v1'||!Array.isArray(data.jobs)||!Array.isArray(data.entries))throw Error('Not a valid Bonus Tracker backup/import file.');if(data.entries.some(e=>!e||typeof e.id!=='string'||typeof e.date!=='string'||!Number.isFinite(Number(e.duration))||Number(e.duration)<0))throw Error('Invalid entries in import file.');if(data.jobs.some(j=>!j||typeof j.id!=='string'||typeof j.name!=='string'))throw Error('Invalid jobs in import file.');const currentIds=new Set(state.entries.map(e=>String(e.id)));const jobIds=new Set(state.jobs.map(j=>j.id));const map=new Map();let jobsAdded=0,added=0;for(const job of data.jobs){const same=state.jobs.find(j=>j.id===job.id)||state.jobs.find(j=>j.name.trim().toLowerCase()===job.name.trim().toLowerCase());if(same){map.set(job.id,same.id)}else{const copy={...job};state.jobs.push(copy);jobIds.add(copy.id);map.set(job.id,copy.id);jobsAdded++}}for(const entry of data.entries){if(currentIds.has(entry.id))continue;const mapped=map.get(entry.jobId);if(!mapped)throw Error('Entry references a missing job: '+entry.jobId);state.entries.push({...entry,jobId:mapped});currentIds.add(entry.id);added++}if(data.timesheets&&typeof data.timesheets==='object'&&!Array.isArray(data.timesheets)){state.timesheets||={};for(const [jobId,years] of Object.entries(data.timesheets)){const target=map.get(jobId);if(!target||!years||typeof years!=='object'||Array.isArray(years))continue;state.timesheets[target]||={};for(const [year,months] of Object.entries(years)){if(!state.timesheets[target][year])state.timesheets[target][year]=months}}}try{save()}catch(e){throw Error('Browser storage is full. Download your data and free up space.')}status.textContent=`Imported ${added} entries and ${jobsAdded} jobs. Skipped ${data.entries.length-added} existing entries.`;alert(status.textContent);render()}catch(err){status.textContent='Import failed: '+err.message;alert(status.textContent)}}
 function bindSettings(){document.getElementById('openThemes')?.addEventListener('click',()=>{themePage=true;render()});document.getElementById('themeBack')?.addEventListener('click',()=>{themePage=false;render()});document.querySelectorAll('[data-theme]').forEach(b=>b.addEventListener('click',()=>{setTheme(b.dataset.theme);render()}));document.getElementById('backupDownload')?.addEventListener('click',backupDownload);document.getElementById('backupImport')?.addEventListener('click',backupImport)}
@@ -193,13 +211,15 @@ document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{const next=b.dataset
   $('#searchInput').value=query;
   if(searchOpen)$('#searchInput').focus({preventScroll:true});
 }
+// Opening an empty search must never trigger the expensive Entries render.
 $('#searchToggle').onclick=()=>{
-  const previousTab=tab,previousQuery=query;
   searchOpen=!searchOpen;
-  if(searchOpen){tab='entries';entryPage={level:'weeks',week:null,day:null}}
-  else query='';
-  if(tab!==previousTab||previousQuery!==query)render();
-  else updateSearchUI();
+  if(!searchOpen){
+    const wasFiltered=!!query;
+    query='';
+    if(wasFiltered && tab==='entries')render();
+    else updateSearchUI();
+  }else updateSearchUI();
 };
 // Dismiss Search when the user interacts anywhere outside its controls.
 document.addEventListener('pointerdown',ev=>{
@@ -210,7 +230,7 @@ document.addEventListener('pointerdown',ev=>{
   query='';
   updateSearchUI();
   // Let the clicked control finish its action before refreshing filtered results.
-  if(hadQuery)setTimeout(()=>{if(!searchOpen)render()},0);
+  if(hadQuery && tab==='entries')requestAnimationFrame(()=>{if(!searchOpen)render()});
 });
 $('#searchClose').onclick=()=>{
   const hadQuery=!!query;
@@ -223,7 +243,9 @@ $('#searchInput').oninput=e=>{
   query=input.value;
   clearTimeout(searchTimer);
   searchTimer=setTimeout(()=>{
-    if(!searchOpen||tab!=='entries')return;
+    if(!searchOpen)return;
+    if(query.trim() && tab!=='entries'){tab='entries';entryPage={level:'weeks',week:null,day:null};}
+    if(tab!=='entries')return;
     const active=document.activeElement===input;
     const pos=input.selectionStart;
     render();
