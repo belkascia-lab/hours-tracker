@@ -432,4 +432,27 @@ if(entryModal&&editEntry){
 }
 bindEntryPhotos();$('#entryForm')?.addEventListener('submit',async ev=>{ev.preventDefault();let f=new FormData(ev.target),raw=String(f.get('duration')).trim(),comment=String(f.get('comment')).trim();if(!raw&&!comment){if(ev.target.photoDraft?.length&&!confirm('Hours and comment are empty. Close without saving photos or changes?'))return;editEntry=null;entryModal=false;render();return}let duration=raw?(/^\d+(\.\d+)?$/.test(raw)?Math.round(Number(raw)*60)/60:null):0;if(duration===null||(raw&&duration<=0)){alert('Enter valid decimal hours, e.g. 1.50.');return}if(!raw&&!confirm('No hours entered. Save anyway?'))return;if(!comment&&!confirm('No comment entered. Save anyway?'))return;let startTime=clockHours(String(f.get('start'))),finishTime=clockHours(String(f.get('finish')));if(startTime===null||finishTime===null){alert('Enter start and finish times');return}let old=state.entries.find(e=>e.id===editEntry),x={id:editEntry||uid(),jobId:old?.jobId||state.selected,date:String(f.get('date')),start:startTime,duration,hourlyRateSnapshot:old?.hourlyRateSnapshot??n(selected()?.hourly),bonusRateSnapshot:old?.bonusRateSnapshot??n(selected()?.bonusRate),comment:String(f.get('comment')),order:old?.order??Date.now(),photoCount:ev.target.photoDraft.length};const form=ev.target;if(!form.photoReady)return;const buttons=[...form.querySelectorAll('button')];buttons.forEach(b=>b.disabled=true);const before=JSON.stringify(state);let previousPhotos;try{if(old?.photoCount||x.photoCount){previousPhotos=old?.photoCount?await photoStore(x.id):[];await photoStore(x.id,form.photoDraft)}if(editEntry)state.entries=state.entries.map(e=>e.id===editEntry?x:e);else state.entries.push(x);if(old)recalcDay(old.date,old.jobId);recalcDay(x.date,x.jobId);state.selected=x.jobId;save()}catch(err){state=JSON.parse(before);if(previousPhotos)try{await photoStore(x.id,previousPhotos)}catch{}alert('Entry could not be saved. Check available storage and try again.');buttons.forEach(b=>b.disabled=false);return}editEntry=null;entryModal=false;render()})}
 $('#settingsToggle').onclick=()=>{tab='settings';themePage=false;searchOpen=false;query='';editEntry=null;entryModal=false;editJob=null;jobModal=false;render()};document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;themePage=false;editEntry=null;entryModal=false;editJob=null;jobModal=false;render()});$('#searchToggle').onclick=()=>{searchOpen=!searchOpen;if(searchOpen){tab='entries';entryPage={level:'weeks',week:null,day:null}}if(!searchOpen)query='';render();if(searchOpen)$('#searchInput').focus()};$('#searchClose').onclick=()=>{searchOpen=false;query='';render()};$('#searchInput').oninput=e=>{query=e.target.value;let p=e.target.selectionStart;render();let i=$('#searchInput');i.focus();i.setSelectionRange(p,p)};render();
+
+// Swipe between main tabs, without interfering with vertical scrolling or dialogs.
+(()=>{
+ const area=document.getElementById('content'), order=['jobs','entries','bonus'];
+ let start=null, suppressUntil=0;
+ const blocked=()=>!order.includes(tab)||searchOpen||entryModal||jobModal||entryActions||selectedEntryIds.size||document.querySelector('.modal-backdrop,[aria-modal="true"]');
+ area.addEventListener('touchstart',e=>{
+  start=null;
+  if(blocked()||e.touches.length!==1||e.target.closest('input,textarea,select,[contenteditable],a'))return;
+  const t=e.touches[0]; start={x:t.clientX,y:t.clientY,id:t.identifier,tab,at:Date.now()};
+ },{passive:true});
+ area.addEventListener('touchmove',e=>{if(!start)return;if(e.touches.length!==1){start=null;return;}const t=e.touches[0];if(Math.abs(t.clientY-start.y)>35&&Math.abs(t.clientY-start.y)>Math.abs(t.clientX-start.x))start=null;},{passive:true});
+ area.addEventListener('touchcancel',()=>{start=null;},{passive:true});
+ area.addEventListener('touchend',e=>{
+  const a=start;start=null;if(!a||blocked()||tab!==a.tab||Date.now()-a.at>650)return;
+  const t=Array.from(e.changedTouches).find(t=>t.identifier===a.id);if(!t)return;
+  const dx=t.clientX-a.x,dy=t.clientY-a.y;if(Math.abs(dx)<70||Math.abs(dx)<1.7*Math.abs(dy))return;
+  const next=order[order.indexOf(tab)+(dx<0?1:-1)];if(!next)return;
+  if(e.cancelable)e.preventDefault();suppressUntil=Date.now()+350;
+  document.querySelector('.tab[data-tab="'+next+'"]').click();
+ },{passive:false});
+ area.addEventListener('click',e=>{if(Date.now()<suppressUntil){e.preventDefault();e.stopImmediatePropagation();}},true);
+})();
 </script></body></html>
