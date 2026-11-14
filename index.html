@@ -236,6 +236,7 @@ body.jobs-tab #content .jobs-list .job:not(.selected){
 #settingsToggle svg{display:block;flex:none}
 
 .entry-photos{border:1px solid var(--border,#6baf82);border-radius:10px;padding:12px;margin:12px 0;display:grid;gap:9px}.photo-heading{display:flex;justify-content:space-between;align-items:center}.photo-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}.photo-buttons button,.photo-view{display:flex;align-items:center;justify-content:center;gap:7px;min-width:0}.entry-photos svg,.entry-photo-count svg{width:19px;height:19px;flex:none}.entry-photo-count{display:flex;align-items:center;gap:6px;font-size:.86em;margin-top:6px}.photo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.photo-tile{min-width:0;display:grid;gap:5px}.photo-tile img{width:100%;height:110px;object-fit:cover;border-radius:8px}.photo-tile button{width:100%}.photo-overlay{position:fixed;inset:0;background:#000e;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:12px}.photo-overlay img{max-width:100%;max-height:82dvh;object-fit:contain}.entry-photos input[type=file]{display:none}.entry-photos [hidden]{display:none!important}
+#app.jobs-tab, body.jobs-tab #app {touch-action:pan-y;}
 </style></head><body><div id="app"><div class="top"><div class="brand">Bonus Tracker</div><div class="top-actions"><button class="icon" id="searchToggle" title="Search entries" aria-label="Search entries">⌕</button><button class="icon settings-icon" id="settingsToggle" title="Settings" aria-label="Settings"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 2h3.4l.5 2.3 1.7.7 2-1.3 2.4 2.4-1.3 2 .7 1.7 2.3.5v3.4l-2.3.5-.7 1.7 1.3 2-2.4 2.4-2-1.3-1.7.7-.5 2.3h-3.4l-.5-2.3-1.7-.7-2 1.3-2.4-2.4 1.3-2-.7-1.7-2.3-.5v-3.4l2.3-.5.7-1.7-1.3-2 2.4-2.4 2 1.3 1.7-.7Z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div><div id="searchArea" class="searchbar hide"><input id="searchInput" placeholder="Search comments, jobs, dates…"><button class="btn secondary" id="searchClose">Close</button></div><nav class="tabs"><button class="tab active" data-tab="jobs">Jobs</button><button class="tab" data-tab="entries">Entries</button><button class="tab" data-tab="bonus">Bonus</button></nav><main id="content"></main></div>
 <script>
 const THEME_KEY='bonus-tracker-theme-v1';
@@ -435,7 +436,7 @@ $('#settingsToggle').onclick=()=>{tab='settings';themePage=false;searchOpen=fals
 
 // Swipe between main tabs, without interfering with vertical scrolling or dialogs.
 (()=>{
- const area=document.getElementById('app'), content=document.getElementById('content'), order=['jobs','entries','bonus'];
+ const area=document, content=document.getElementById('content'), order=['jobs','entries','bonus'];
  let start=null, suppressUntil=0;
  const blocked=()=>!order.includes(tab)||(tab==='entries'&&entryPage.level!=='weeks')||searchOpen||entryModal||jobModal||entryActions||selectedEntryIds.size||document.querySelector('.modal-backdrop,[aria-modal="true"]');
  area.addEventListener('touchstart',e=>{
@@ -451,9 +452,10 @@ $('#settingsToggle').onclick=()=>{tab='settings';themePage=false;searchOpen=fals
   const t=Array.from(e.changedTouches).find(t=>t.identifier===a.id);if(!t)return;
   const dx=t.clientX-a.x,dy=t.clientY-a.y;if(Math.abs(dx)<70||Math.abs(dx)<1.7*Math.abs(dy))return;
   const next=order[order.indexOf(tab)+(dx<0?1:-1)];if(!next)return;
-  if(e.cancelable)e.preventDefault();suppressUntil=Date.now()+350;
+  if(e.cancelable)e.preventDefault();
   document.querySelector('.tab[data-tab="'+next+'"]').click();
+  suppressUntil=Date.now()+350;
  },{passive:false});
- area.addEventListener('click',e=>{if(Date.now()<suppressUntil){e.preventDefault();e.stopImmediatePropagation();}},true);
+ area.addEventListener('click',e=>{if(e.isTrusted&&Date.now()<suppressUntil){e.preventDefault();e.stopImmediatePropagation();}},true);
 })();
 </script></body></html>
