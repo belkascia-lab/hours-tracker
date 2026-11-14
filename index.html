@@ -435,12 +435,13 @@ $('#settingsToggle').onclick=()=>{tab='settings';themePage=false;searchOpen=fals
 
 // Swipe between main tabs, without interfering with vertical scrolling or dialogs.
 (()=>{
- const area=document.getElementById('content'), order=['jobs','entries','bonus'];
+ const area=document.getElementById('app'), content=document.getElementById('content'), order=['jobs','entries','bonus'];
  let start=null, suppressUntil=0;
- const blocked=()=>!order.includes(tab)||searchOpen||entryModal||jobModal||entryActions||selectedEntryIds.size||document.querySelector('.modal-backdrop,[aria-modal="true"]');
+ const blocked=()=>!order.includes(tab)||(tab==='entries'&&entryPage.level!=='weeks')||searchOpen||entryModal||jobModal||entryActions||selectedEntryIds.size||document.querySelector('.modal-backdrop,[aria-modal="true"]');
  area.addEventListener('touchstart',e=>{
   start=null;
   if(blocked()||e.touches.length!==1||e.target.closest('input,textarea,select,[contenteditable],a'))return;
+  if(tab==='jobs'){if(e.touches[0].clientY<document.querySelector('.tabs').getBoundingClientRect().bottom)return;}else if(!content.contains(e.target))return;
   const t=e.touches[0]; start={x:t.clientX,y:t.clientY,id:t.identifier,tab,at:Date.now()};
  },{passive:true});
  area.addEventListener('touchmove',e=>{if(!start)return;if(e.touches.length!==1){start=null;return;}const t=e.touches[0];if(Math.abs(t.clientY-start.y)>35&&Math.abs(t.clientY-start.y)>Math.abs(t.clientX-start.x))start=null;},{passive:true});
